@@ -5,25 +5,15 @@ green='\033[0;32m'
 yellow='\033[0;33m'
 plain='\033[0m'
 
-cur_dir=$(pwd)
-
 # Check if running as root
 if [[ $EUID -ne 0 ]]; then
     echo -e "${red}Error:${plain} Please run this script with root privileges."
     exit 1
 fi
 
-# Check OS and architecture
-if [[ -f /etc/os-release ]]; then
-    source /etc/os-release
-    release=$ID
-else
-    echo -e "${red}Error:${plain} Failed to detect OS."
-    exit 1
-fi
-
-if [[ "${release}" != "alpine" ]]; then
-    echo -e "${red}This script is only supported on Alpine Linux.${plain}"
+# Check if OS is Alpine Linux
+if ! grep -q 'Alpine' /etc/os-release; then
+    echo -e "${red}This script only supports Alpine Linux.${plain}"
     exit 1
 fi
 
@@ -40,6 +30,16 @@ arch() {
 
 cpu_arch=$(arch)
 echo "CPU Architecture: $cpu_arch"
+
+# Install glibc for Alpine (from sgerrand repository)
+install_glibc() {
+    echo -e "${yellow}Installing glibc compatibility layer...${plain}"
+    wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
+    wget -q https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.34-r0/glibc-2.34-r0.apk
+    apk add --no-cache glibc-2.34-r0.apk
+    rm -f glibc-2.34-r0.apk
+    echo -e "${green}glibc installed successfully.${plain}"
+}
 
 # Install base dependencies
 install_base() {
@@ -95,4 +95,5 @@ EOF
 # Start installation
 echo -e "${green}Starting installation...${plain}"
 install_base
+install_glibc
 install_s_ui
