@@ -35,7 +35,7 @@ echo "CPU Architecture: $cpu_arch"
 install_glibc() {
     echo -e "${yellow}Installing glibc compatibility layer...${plain}"
     wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
-    wget -q https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.34-r0/glibc-2.34-r0.apk
+    wget -q https://github.com/sgerrand/alpine-pkg-glibc/releases/latest/download/glibc-2.34-r0.apk
     apk add --no-cache glibc-2.34-r0.apk
     rm -f glibc-2.34-r0.apk
     echo -e "${green}glibc installed successfully.${plain}"
